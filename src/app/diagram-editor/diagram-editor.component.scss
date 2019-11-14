@@ -1,0 +1,58 @@
+#graphContainer {
+    position: absolute;
+    width: calc(100vw - 20px);
+    height: calc(100vh - 20px);
+    left: 20px;
+    overflow: scroll;
+    background-image: linear-gradient(#CCCFD5  .1em, transparent .1em), linear-gradient(90deg, #CCCFD5  .1em, transparent .1em);
+    background-size: 3em 3em;
+}
+
+#toolbar {
+    position: absolute;
+    width: 20px;
+    padding-right: 4px;
+    height: 100vh;
+    background-color: #EDEEEE;
+}
+
+#button-test {
+    position: relative;
+    height: 20px;
+}
+
+#container-buttons-down {
+    position: absolute;
+    top: calc(100vh - 20px);
+    width: calc(100vw - 20px);
+    left: 20px;
+    background-color: #EDEEEE;
+}
+
+.button-down {
+    border-radius: 2px;
+    background-color: #B1C6F1 ;
+}
+
+#popup {
+    background-color: #F5F5F5;
+    overflow: hidden;
+
+    width: 20vw;
+    height: 20vh;
+
+    min-width: 300px;
+    min-height: 300px;
+    
+    position: absolute;
+    right: 30px;
+    top: 10px;
+    border-radius: 2px;
+    border-style: inset;
+
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
