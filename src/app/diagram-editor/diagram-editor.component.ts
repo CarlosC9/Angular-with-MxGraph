@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { mxgraph } from 'mxgraph';
 
 declare var require: any;
@@ -13,6 +13,7 @@ const mx: typeof mxgraph = require('mxgraph')({
   selector: 'app-diagram-editor',
   templateUrl: './diagram-editor.component.html',
   styleUrls: ['./diagram-editor.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class DiagramEditorComponent implements AfterViewInit {
 
@@ -36,19 +37,18 @@ export class DiagramEditorComponent implements AfterViewInit {
 
       this.graph = new mx.mxGraph(this.graphContainer.nativeElement);
       this.toolbar = new mx.mxToolbar(this.toolbarContainer.nativeElement);
+      this.toolbar.enabled = false;
       this.encoder = new mx.mxCodec(null);
+      
       this.addVertexToolbar('assets/mxgraph/rectangle.gif', 100, 40, 'resizable=0;rounded=1;');
-      this.addVertexToolbar('assets/mxgraph/rectangle.gif', 50, 50, '');
-      this.graph.getSelectionModel().addListener(mx.mxEvent.CHANGE, function(sender, evt)
-				{
-          DiagramEditorComponent.selectionChanged(this.graph);
-        });
-        
+      
+      this.evtDoubleClick();
+
     }
     
   }
 
-  private addVertexToolbar(icon , w : number, h : number, style) {
+  private addVertexToolbar(icon : string , w : number, h : number, style : string) {
 
     var vertex = new mx.mxCell(null, new mx.mxGeometry(0, 0, w, h), style);
     vertex.setVertex(true);
@@ -83,7 +83,7 @@ export class DiagramEditorComponent implements AfterViewInit {
     
     console.log( "Test XML/JSON:\n" + JSON.stringify(json) + "\n\n" + xml);
 
-    this.saveData(xml, "test.xml");
+    this.saveData(xml, "test.xml", "text/xml");
   }
 
   private getDIagramXML() {
@@ -92,14 +92,14 @@ export class DiagramEditorComponent implements AfterViewInit {
     return mx.mxUtils.getXml(result);
   }
 
-  private saveData(data, fileName) {
+  private saveData(data, fileName, type) {
     
     let a = document.createElement("a");
     document.body.appendChild(a);
     a.style.display = "none";
 
-    let blob = new Blob([data], {type: "text/xml;charset=utf-8"}),
-        url = window.URL.createObjectURL(blob);
+    let blob = new Blob([data], {type: type + ";charset=utf-8"}),
+    url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = fileName;
     a.click();
@@ -107,17 +107,47 @@ export class DiagramEditorComponent implements AfterViewInit {
 
   }
 
-  static selectionChanged(graph) {
+  private evtDoubleClick() {
 
-    let cell = graph.getSelectionCell();
-    let popup =  document.getElementById('popup')
+    this.graph.addListener(mx.mxEvent.DOUBLE_CLICK, function(sender, evt)
+    {
+      let cell = evt.getProperty('cell');
+      console.log(cell.id);
+      
+      if (cell != null) {
+        let popup = document.getElementById("popup");
 
-    if (cell == null) {
-      popup.style.display = "none";
-    } else {
-      popup.style.display = "block";
-    }
+        popup.style.display = "block";
+
+        popup.innerHTML = "";
+        
+        var inputs = popup.getElementsByTagName("input");
+
+        for (let i = 0; i < inputs.length; i++) {
+          
+          inputs[i].addEventListener("change", (evt) => {
+            //let type = evt.target.getAttribute("data-type");
+          });
+
+        }
+      }
+    });
   }
-  
+
+  private popupInput(label,type) {
+
+    if (type = "value") {
+      label = "Nombre";
+    }
+    
+    let div : HTMLDivElement = document.createElement("div");
+
+    let strong  = document.createElement("strong");
+    
+    let input : HTMLInputElement = document.createElement('input');
+    input.setAttribute("data-type","value");
+    input.setAttribute("type","text");
+    
+  }
 
 }

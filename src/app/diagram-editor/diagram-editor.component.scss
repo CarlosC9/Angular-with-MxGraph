@@ -1,8 +1,12 @@
+#diagram-component {
+    width: 100%;
+    height: 100%;
+}
+
 #graphContainer {
     position: absolute;
-    width: calc(100vw - 20px);
-    height: calc(100vh - 20px);
-    left: 20px;
+    width: 100%;
+    height: 100%;
     overflow: scroll;
     background-image: linear-gradient(#CCCFD5  .1em, transparent .1em), linear-gradient(90deg, #CCCFD5  .1em, transparent .1em);
     background-size: 3em 3em;
@@ -10,10 +14,17 @@
 
 #toolbar {
     position: absolute;
-    width: 20px;
-    padding-right: 4px;
-    height: 100vh;
-    background-color: #EDEEEE;
+    width: 34px;
+    padding: 4px 4px 0px 4px;
+    left: 20px;
+    top: 22px;
+    background-color: #DEDEDE;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+#toolbar img {
+    width: 30px;
 }
 
 #button-test {
@@ -38,9 +49,6 @@
     background-color: #F5F5F5;
     overflow: hidden;
 
-    width: 20vw;
-    height: 20vh;
-
     min-width: 300px;
     min-height: 300px;
     
@@ -51,6 +59,20 @@
     border-style: inset;
 
     display: none;
+}
+
+#popup input {
+    width: calc(100% - 60px);
+    margin: 0px 30px;
+}
+
+#popup strong {
+    margin: 0px 30px;
+    text-transform: capitalize;
+}
+
+#popup div {
+    margin-top: 20px;
 }
 
 .hidden {
