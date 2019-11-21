@@ -40,50 +40,45 @@ export class DiagramEditorComponent implements AfterViewInit {
       this.toolbar.enabled = false;
       this.encoder = new mx.mxCodec(null);
       
-      this.addVertexToolbar('assets/mxgraph/rectangle.gif', 100, 40, 'resizable=0;rounded=1;');
       
-      this.evtDoubleClick();
+      this.addToolbarInterfaceType('assets/mxgraph/rectangle.gif');
+      
+      this.createEventDoubleClickGraph();
 
     }
     
   }
 
-  private addVertexToolbar(icon : string , w : number, h : number, style : string) {
-
-    var vertex = new mx.mxCell(null, new mx.mxGeometry(0, 0, w, h), style);
-    vertex.setVertex(true);
-				
-    this.addToolbarItem(vertex, icon);
+    private addToolbarInterfaceType(icon) {
     
-  }
-
-  private addToolbarItem(prototype, image) {
-    
-    var funct = function(graph, evt, cell)
+    var funct = function(graph : mxgraph.mxGraph, evt, cell)
 		{
 			graph.stopEditing(false);
 
-			var pt = graph.getPointForEvent(evt);
-			var vertex = graph.getModel().cloneCell(prototype);
-			vertex.geometry.x = pt.x;
-			vertex.geometry.y = pt.y;
+      var pt = graph.getPointForEvent(evt);
+      console.log(pt);
+      
+      let doc = mx.mxUtils.createXmlDocument();
+
+      let interfaceType = doc.createElement('interfacetype');
+			interfaceType.setAttribute('name', 'InterfaceType');
 					
-			graph.setSelectionCells(graph.importCells([vertex], 0, 0, cell));
+      graph.insertVertex(graph.getDefaultParent(),null,interfaceType,pt.x,pt.y,100,40,'resizable=0;rounded=1;');
 		}
 
 			
-      var img = this.toolbar.addMode(null, image, funct);
+      var img = this.toolbar.addMode(null, icon, funct);
       mx.mxUtils.makeDraggable(img, this.graph, funct);
+
+      
   }
 
   onSaveLocalXMLButtonClick() {
 
     let xml = this.getDIagramXML();
     let json = parser.xml2json(xml);
-    
-    console.log( "Test XML/JSON:\n" + JSON.stringify(json) + "\n\n" + xml);
 
-    this.saveData(xml, "test.xml", "text/xml");
+    //this.saveData(xml, "test.xml", "text/xml");
   }
 
   private getDIagramXML() {
@@ -107,47 +102,69 @@ export class DiagramEditorComponent implements AfterViewInit {
 
   }
 
-  private evtDoubleClick() {
-
-    this.graph.addListener(mx.mxEvent.DOUBLE_CLICK, function(sender, evt)
-    {
-      let cell = evt.getProperty('cell');
-      console.log(cell.id);
-      
-      if (cell != null) {
-        let popup = document.getElementById("popup");
-
-        popup.style.display = "block";
-
-        popup.innerHTML = "";
-        
-        var inputs = popup.getElementsByTagName("input");
-
-        for (let i = 0; i < inputs.length; i++) {
-          
-          inputs[i].addEventListener("change", (evt) => {
-            //let type = evt.target.getAttribute("data-type");
-          });
-
-        }
-      }
-    });
+  private createEventDoubleClickGraph() {
+    console.log("create event");
+    this.graph.addListener(mx.mxEvent.DOUBLE_CLICK, this.doubleClickGraph.bind(this))
   }
 
-  private popupInput(label,type) {
-
-    if (type = "value") {
-      label = "Nombre";
-    }
+  private doubleClickGraph(sender,evt) {
+    console.log("Double click");
+    let cell = evt.getProperty('cell');
     
+    if (cell != null) {
+      let popup = document.getElementById("popup");
+
+      popup.style.display = "block";
+
+      popup.innerHTML = "";
+
+      for (let i = 0; i < cell.value.attributes.length; i++) {
+        let type = cell.value.attributes[i].name;
+        let value = cell.value.attributes[i].nodeValue;
+        popup.append(this.createInputForPopup(cell.id, type, value));
+      }
+      
+    }
+  }
+
+
+
+  private createInputForPopup(id : string, type : string, value : string) {
+
     let div : HTMLDivElement = document.createElement("div");
 
-    let strong  = document.createElement("strong");
+    let strong :HTMLElement  = document.createElement("strong");
+    strong.innerText = type;
     
     let input : HTMLInputElement = document.createElement('input');
-    input.setAttribute("data-type","value");
-    input.setAttribute("type","text");
+    input.setAttribute("data-type",type);
+    input.setAttribute("type","type");
+    input.setAttribute("data-cell-id",id);
+    input.value = value;
     
+    input.addEventListener("input", this.changeAttributeCell.bind(this));
+
+    div.append(strong);
+    div.append(input);
+    
+    return div;
   }
+
+  private changeAttributeCell(evt) {
+    
+    let inputTarget = <HTMLInputElement> evt.target;
+    let type = inputTarget.getAttribute("data-type");
+    let id = inputTarget.getAttribute("data-cell-id");
+    let value = inputTarget.value;
+
+    let cell = this.graph.getModel().getCell(id);
+    console.log(cell.value.attributes[type]);
+
+    cell.value.attributes[type].nodeValue = value;
+    
+
+  }
+
+
 
 }
