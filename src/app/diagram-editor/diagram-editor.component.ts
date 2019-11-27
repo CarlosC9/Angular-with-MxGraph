@@ -1,6 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { mxgraph } from 'mxgraph';
-import { LineToLineMappedSource } from 'webpack-sources';
 
 declare var require: any;
 
@@ -22,13 +21,16 @@ export class DiagramEditorComponent implements AfterViewInit {
   @ViewChild('toolbar', { static: false }) toolbarContainer: ElementRef;
   @ViewChild('saveLocalXML', { static: false }) saveLocalXMLInput: ElementRef;
 
+  public static ARROW_NOT_CREATE = 0;
+  public static ARROW_CREATE_PARENT = 1;
+  public static ARROW_CREATE_SCALE = 2;
+
   private graph: mxgraph.mxGraph;
   private toolbar: mxgraph.mxToolbar;
   private encoder: mxgraph.mxCodec;
-  private arrowsEditing: number = 0;
-  private sourceArrow: mxgraph.mxCell;
+  private typeArrowCreate: number = 0;
+  private sourceCell: mxgraph.mxCell;
   private statePrintArrow: number = 0;
-  private printArrow;
 
   constructor() { }
 
@@ -50,25 +52,24 @@ export class DiagramEditorComponent implements AfterViewInit {
       this.encoder = new mx.mxCodec(null);
 
       this.addToolbarInterfaceType('assets/mxgraph/rectangle.gif');
-
-      let arrow1: HTMLImageElement = document.createElement("img");
-      arrow1.setAttribute("src", "assets/img/diagonal-arrow.png");
-      arrow1.setAttribute("alt", "arrow1");
-      arrow1.ondragstart = () => { return false; };
-      let funClickArrow1 = (evt) => {
-        this.arrowsEditing = 1;
-        let cells: Object[] = this.graph.getChildVertices(this.graph.getDefaultParent());
-        this.graph.setCellStyles(mx.mxConstants.STYLE_MOVABLE, "0", cells);
-        this.graph.setCellStyles(mx.mxConstants.STYLE_EDITABLE, "0", cells);
-        let gElements = document.getElementsByTagName("g");
-        for (let i = 0; i < gElements.length; i++) {
-          gElements[i].style.cursor = "pointer";
-        }
-      }
-      arrow1.addEventListener("click", funClickArrow1.bind(this));
-      this.toolbarContainer.nativeElement.append(arrow1);
+      this.createIconsEdges();
 
       this.createEventsGraph();
+
+
+      var modal = document.getElementById("myModal");
+
+      var span = <HTMLElement>document.getElementsByClassName("close")[0];
+
+    
+      span.onclick = function () {
+        modal.style.display = "none";
+      }
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
 
       this.graph.convertValueToString = function (cell) {
         if (mx.mxUtils.isNode(cell.value)) {
@@ -136,8 +137,7 @@ export class DiagramEditorComponent implements AfterViewInit {
       this.graph.cellLabelChanged = funCellLabelChanged.bind(this);
 
       this.graph.getEditingValue = function (cell) {
-        if (mx.mxUtils.isNode(cell.value) &&
-          cell.value.nodeName.toLowerCase() == 'interfacetype') {
+        if (mx.mxUtils.isNode(cell.value)) {
           var name = cell.getAttribute('name', '');
 
           return name;
@@ -148,7 +148,60 @@ export class DiagramEditorComponent implements AfterViewInit {
 
   }
 
+  private createIconsEdges() {
+
+    let funTransparentIcon = () => {
+      let icons: HTMLElement[] = this.toolbarContainer.nativeElement.getElementsByTagName("img");
+      for (let i = 0; i < icons.length; i++) {
+        icons[i].style.backgroundColor = "transparent"
+      }
+    }
+
+    let parentArrowImage: HTMLImageElement = document.createElement("img");
+    parentArrowImage.id = "parent-arrow-img";
+    parentArrowImage.setAttribute("src", "assets/img/diagonal-arrow.png");
+    parentArrowImage.setAttribute("alt", "arrow1");
+    parentArrowImage.ondragstart = () => { return false; };
+    let funClickParentArrow = (evt) => {
+      funTransparentIcon();
+      let target = <HTMLElement>evt.target;
+      target.style.backgroundColor = "#AFAFAF";
+      this.typeArrowCreate = DiagramEditorComponent.ARROW_CREATE_PARENT;
+      let cells: Object[] = this.graph.getChildVertices(this.graph.getDefaultParent());
+      this.graph.setCellStyles(mx.mxConstants.STYLE_MOVABLE, "0", cells);
+      this.graph.setCellStyles(mx.mxConstants.STYLE_EDITABLE, "0", cells);
+      let gElements = document.getElementsByTagName("g");
+      for (let i = 0; i < gElements.length; i++) {
+        gElements[i].style.cursor = "pointer";
+      }
+    }
+    parentArrowImage.addEventListener("click", funClickParentArrow.bind(this));
+    this.toolbarContainer.nativeElement.append(parentArrowImage);
+
+    let scaleChangeArrowImage: HTMLImageElement = document.createElement("img");
+    scaleChangeArrowImage.id = "scale-change-arrow-img";
+    scaleChangeArrowImage.setAttribute("src", "assets/img/diagonal-arrow.png");
+    scaleChangeArrowImage.setAttribute("alt", "arrow1");
+    scaleChangeArrowImage.ondragstart = () => { return false; };
+    let funClickScaleChangeArrow = (evt) => {
+      funTransparentIcon();
+      let target = <HTMLElement>evt.target;
+      target.style.backgroundColor = "#AFAFAF";
+      this.typeArrowCreate = DiagramEditorComponent.ARROW_CREATE_SCALE;
+      let cells: Object[] = this.graph.getChildVertices(this.graph.getDefaultParent());
+      this.graph.setCellStyles(mx.mxConstants.STYLE_MOVABLE, "0", cells);
+      this.graph.setCellStyles(mx.mxConstants.STYLE_EDITABLE, "0", cells);
+      let gElements = document.getElementsByTagName("g");
+      for (let i = 0; i < gElements.length; i++) {
+        gElements[i].style.cursor = "pointer";
+      }
+    }
+    scaleChangeArrowImage.addEventListener("click", funClickScaleChangeArrow.bind(this));
+    this.toolbarContainer.nativeElement.append(scaleChangeArrowImage);
+  }
+
   private addToolbarInterfaceType(icon) {
+
 
     var funct = function (graph: mxgraph.mxGraph, evt, cell) {
 
@@ -180,14 +233,21 @@ export class DiagramEditorComponent implements AfterViewInit {
 
     console.log(xml);
 
-    //this.saveData(xml, "test.xml", "text/xml");
+    var modal = document.getElementById("myModal");
+
+    var btn = document.getElementById("button-test");
+
+    var span = <HTMLElement>document.getElementsByClassName("close")[0];
+
+    modal.style.display = "block";
   }
 
   private getDIagramXML() {
 
     let result = this.encoder.encode(this.graph.getModel());
 
-    return mx.mxUtils.getXml(result);
+    //return mx.mxUtils.getPrettyXml(result);
+    return mx.mxUtils.getPrettyXml(result);
 
   }
 
@@ -224,8 +284,9 @@ export class DiagramEditorComponent implements AfterViewInit {
     if (pointerEvent.button == 0) {
       let cell: mxgraph.mxCell = mouseEvent.getCell();
       if (cell != null) {
-        if (this.arrowsEditing == 1 || this.arrowsEditing == 2) {
-          this.sourceArrow = cell;
+        if (cell.value.nodeName.toLowerCase() == 'interfacetype' && this.typeArrowCreate > DiagramEditorComponent.ARROW_NOT_CREATE) {
+
+          this.sourceCell = cell;
           this.statePrintArrow = 1;
 
           let line: SVGLineElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -236,9 +297,18 @@ export class DiagramEditorComponent implements AfterViewInit {
           line.setAttribute("x2", cellCenterX.toString());
           line.setAttribute("y1", cellCenterY.toString());
           line.setAttribute("y2", cellCenterY.toString());
+          switch (this.typeArrowCreate) {
+            case DiagramEditorComponent.ARROW_CREATE_PARENT:
+              line.style.stroke = "black";
+              break;
+            case DiagramEditorComponent.ARROW_CREATE_SCALE:
+              line.style.stroke = "#05FF23";
+              break;
+          }
           line.style.stroke = "black";
           line.style.strokeWidth = "2";
           document.getElementsByTagName("svg")[0].append(line);
+
         }
       } else {
         this.cancelArrow();
@@ -250,36 +320,102 @@ export class DiagramEditorComponent implements AfterViewInit {
   private mouseMoveArrow(sender, mouseEvent: mxgraph.mxMouseEvent) {
     if (this.statePrintArrow == 1) {
       let line: HTMLElement = document.getElementById("print-line");
-      let positionX = parseInt(mouseEvent.getGraphX()) - 1;
-      let positionY = parseInt(mouseEvent.getGraphY()) - 1;
+      let sourceX = parseInt(line.getAttribute("x1"));
+      let sourceY = parseInt(line.getAttribute("y1"));
+      let positionX;
+      let positionY;
+
+      if ((mouseEvent.getGraphX() - sourceX) > 0) {
+        positionX = parseInt(mouseEvent.getGraphX()) - 1;
+      } else {
+        positionX = parseInt(mouseEvent.getGraphX()) + 1;
+      }
+
+      if ((mouseEvent.getGraphY() - sourceY) > 0) {
+        positionY = parseInt(mouseEvent.getGraphY()) - 1;
+      } else {
+        positionY = parseInt(mouseEvent.getGraphY()) + 1;
+      }
+
       line.setAttribute("x2", positionX.toString());
       line.setAttribute("y2", positionY.toString());
     }
   }
 
   private mouseUpGraph(sender, mouseEvent: mxgraph.mxMouseEvent) {
-    console.log("enter mouseUp");
-    let pointerEvent = mouseEvent.getEvent();
-    if (pointerEvent.button == 0 && (this.arrowsEditing == 1 || this.arrowsEditing == 2)) {
-      let cell: mxgraph.mxCell = mouseEvent.getCell();
-      if (cell != null) {
-        switch (this.arrowsEditing) {
-          case 1:
-            let doc = mx.mxUtils.createXmlDocument();
 
-            let parentType = doc.createElement('parenttype');
-            parentType.setAttribute('name', 'ParentType');
-            parentType.setAttribute('property_1', '');
-            this.graph.insertEdge(this.graph.getDefaultParent(), null, parentType, this.sourceArrow, cell, 'strokeColor=#000000;perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1');
+    let pointerEvent = mouseEvent.getEvent();
+
+    if (pointerEvent.button == 0 && this.typeArrowCreate > DiagramEditorComponent.ARROW_NOT_CREATE) {
+      let cell: mxgraph.mxCell = mouseEvent.getCell();
+      if (cell != null && cell.value.nodeName.toLowerCase() == 'interfacetype') {
+        switch (this.typeArrowCreate) {
+          case DiagramEditorComponent.ARROW_CREATE_PARENT:
+            try {
+              if (this.sourceCell == cell) {
+                throw new DiagramException(DiagramException.CONNECT_ITSELF, "A vertex cannot cannot be a parent of itself")
+              }
+              let edges: any[] = this.graph.getChildEdges(this.graph.getDefaultParent());
+              for (let i = 0; i < edges.length; i++) {
+                if (mx.mxUtils.isNode(edges[i].value) && edges[i].value.nodeName.toLowerCase() == 'parenttype'
+                  && edges[i].target.id == cell.id)
+                  throw new DiagramException(DiagramException.BAD_HIERARCHY, "A vertex cannot have 2 parents")
+              }
+              let doc = mx.mxUtils.createXmlDocument();
+              let parentType = doc.createElement('parenttype');
+              parentType.setAttribute('name', 'ParentType');
+              parentType.setAttribute('property_1', '');
+              this.graph.insertEdge(this.graph.getDefaultParent(), null, parentType,
+                this.sourceCell, cell, 'strokeColor=#000000;perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0');
+            } catch (ex) {
+              if (ex instanceof DiagramException) {
+                let errorElement = document.getElementById("error-message");
+                errorElement.innerText = ex.message;
+                errorElement.style.display = "block";
+                setTimeout(() => {
+                  errorElement.style.display = "none";
+                }, 5000)
+              }
+            }
+            break;
+
+          case DiagramEditorComponent.ARROW_CREATE_SCALE:
+            try {
+              if (this.sourceCell == cell) {
+                throw new DiagramException(DiagramException.CONNECT_ITSELF, "A vertex cannot connect of itself")
+              }
+              let doc = mx.mxUtils.createXmlDocument();
+              let scaleChangeType = doc.createElement('scalechange');
+              scaleChangeType.setAttribute('name', 'ScaleChange');
+              scaleChangeType.setAttribute('property_1', '');
+              this.graph.insertEdge(this.graph.getDefaultParent(), null, scaleChangeType,
+                this.sourceCell, cell, 'strokeColor=#05FF23;perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0');
+            } catch (ex) {
+              if (ex instanceof DiagramException) {
+                let errorElement = document.getElementById("error-message");
+                errorElement.innerText = ex.message;
+                errorElement.style.display = "block";
+                setTimeout(() => {
+                  errorElement.style.display = "none";
+                }, 5000)
+              }
+            }
+            break;
+
         }
       }
       this.cancelArrow();
-      document.getElementById("print-line").remove();
+      if (document.getElementById("print-line") != null)
+        document.getElementById("print-line").remove();
     }
   }
 
   private cancelArrow() {
-    this.arrowsEditing = 0;
+    let icons: HTMLElement[] = this.toolbarContainer.nativeElement.getElementsByTagName("img");
+    for (let i = 0; i < icons.length; i++) {
+      icons[i].style.backgroundColor = "transparent"
+    }
+    this.typeArrowCreate = DiagramEditorComponent.ARROW_NOT_CREATE;
     this.statePrintArrow = 0;
     let cells: Object[] = this.graph.getChildVertices(this.graph.getDefaultParent());
     this.graph.setCellStyles(mx.mxConstants.STYLE_MOVABLE, "1", cells);
@@ -296,7 +432,6 @@ export class DiagramEditorComponent implements AfterViewInit {
     let cell = evt.getProperty('cell');
 
     if (cell != null) {
-
       console.log(cell);
 
       if (mx.mxUtils.isNode(cell.value)) {
@@ -406,6 +541,14 @@ export class DiagramEditorComponent implements AfterViewInit {
     }
   }
 
+}
 
+class DiagramException extends Error {
 
+  static BAD_HIERARCHY: number = 1;
+  static CONNECT_ITSELF: number = 2;
+
+  constructor(public type: number, public message: string) {
+    super();
+  }
 }
