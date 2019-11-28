@@ -3,7 +3,7 @@ import { mxgraph } from 'mxgraph';
 
 declare var require: any;
 
-const parser = require('xml2json-light');
+const parserXML2JSON = require('xml2json-light');
 
 const mx: typeof mxgraph = require('mxgraph')({
   mxBasePath: 'mxgraph'
@@ -53,23 +53,8 @@ export class DiagramEditorComponent implements AfterViewInit {
 
       this.addToolbarInterfaceType('assets/mxgraph/rectangle.gif');
       this.createIconsEdges();
-
       this.createEventsGraph();
-
-
-      var modal = document.getElementById("myModal");
-
-      var span = <HTMLElement>document.getElementsByClassName("close")[0];
-
-    
-      span.onclick = function () {
-        modal.style.display = "none";
-      }
-      window.onclick = function (event) {
-        if (event.target == modal) {
-          modal.style.display = "none";
-        }
-      }
+      this.eventsModal();
 
       this.graph.convertValueToString = function (cell) {
         if (mx.mxUtils.isNode(cell.value)) {
@@ -219,52 +204,11 @@ export class DiagramEditorComponent implements AfterViewInit {
 
     }
 
-
     var img = this.toolbar.addMode(null, icon, funct);
     mx.mxUtils.makeDraggable(img, this.graph, funct);
 
-
   }
 
-  onSaveLocalXMLButtonClick() {
-
-    let xml = this.getDIagramXML();
-    let json = parser.xml2json(xml);
-
-    console.log(xml);
-
-    var modal = document.getElementById("myModal");
-
-    var btn = document.getElementById("button-test");
-
-    var span = <HTMLElement>document.getElementsByClassName("close")[0];
-
-    modal.style.display = "block";
-  }
-
-  private getDIagramXML() {
-
-    let result = this.encoder.encode(this.graph.getModel());
-
-    //return mx.mxUtils.getPrettyXml(result);
-    return mx.mxUtils.getPrettyXml(result);
-
-  }
-
-  private saveData(data, fileName, type) {
-
-    let a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style.display = "none";
-
-    let blob = new Blob([data], { type: type + ";charset=utf-8" }),
-      url = window.URL.createObjectURL(blob);
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-  }
 
   private createEventsGraph() {
 
@@ -346,20 +290,23 @@ export class DiagramEditorComponent implements AfterViewInit {
 
     let pointerEvent = mouseEvent.getEvent();
 
-    if (pointerEvent.button == 0 && this.typeArrowCreate > DiagramEditorComponent.ARROW_NOT_CREATE) {
+    if (pointerEvent.button == 0) {
       let cell: mxgraph.mxCell = mouseEvent.getCell();
-      if (cell != null && cell.value.nodeName.toLowerCase() == 'interfacetype') {
+      if (cell != null && cell.value.nodeName.toLowerCase() == 'interfacetype' && this.typeArrowCreate > DiagramEditorComponent.ARROW_NOT_CREATE) {
         switch (this.typeArrowCreate) {
           case DiagramEditorComponent.ARROW_CREATE_PARENT:
             try {
               if (this.sourceCell == cell) {
-                throw new DiagramException(DiagramException.CONNECT_ITSELF, "A vertex cannot cannot be a parent of itself")
+                throw new DiagramException(DiagramException.CONNECT_ITSELF, "A vertex cannot cannot be a parent of itself");
               }
               let edges: any[] = this.graph.getChildEdges(this.graph.getDefaultParent());
               for (let i = 0; i < edges.length; i++) {
                 if (mx.mxUtils.isNode(edges[i].value) && edges[i].value.nodeName.toLowerCase() == 'parenttype'
                   && edges[i].target.id == cell.id)
-                  throw new DiagramException(DiagramException.BAD_HIERARCHY, "A vertex cannot have 2 parents")
+                  throw new DiagramException(DiagramException.BAD_HIERARCHY, "A vertex cannot have two parents")
+                else if ( (edges[i].target.id == cell.id && edges[i].source.id == this.sourceCell.id) ||
+                  (edges[i].source.id == cell.id && edges[i].target.id == this.sourceCell.id) )
+                  throw new DiagramException(DiagramException.DOUBLE_RELATIONSHIP, "Two vertex cannot have two relationship between each other");
               }
               let doc = mx.mxUtils.createXmlDocument();
               let parentType = doc.createElement('parenttype');
@@ -383,6 +330,12 @@ export class DiagramEditorComponent implements AfterViewInit {
             try {
               if (this.sourceCell == cell) {
                 throw new DiagramException(DiagramException.CONNECT_ITSELF, "A vertex cannot connect of itself")
+              }
+              let edges: any[] = this.graph.getChildEdges(this.graph.getDefaultParent());
+              for (let i = 0; i < edges.length; i++) {
+                if ( (edges[i].target.id == cell.id && edges[i].source.id == this.sourceCell.id) ||
+                  (edges[i].source.id == cell.id && edges[i].target.id == this.sourceCell.id) )
+                  throw new DiagramException(DiagramException.DOUBLE_RELATIONSHIP, "Two vertex cannot have two relationship between each other");
               }
               let doc = mx.mxUtils.createXmlDocument();
               let scaleChangeType = doc.createElement('scalechange');
@@ -541,12 +494,73 @@ export class DiagramEditorComponent implements AfterViewInit {
     }
   }
 
+  private eventsModal() {
+    
+    let modal = document.getElementById("myModal");
+    let span = <HTMLElement>document.getElementsByClassName("close")[0];
+    let formSave = <HTMLFormElement> document.getElementById("local-save-form");
+
+    span.onclick = function () {
+      modal.style.display = "none";
+    }
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+    let funFormSubmit = (evt) => {
+      evt.preventDefault();
+      modal.style.display = "none";
+      let xml = this.getDiagramXML();
+      let nameFile = evt.target.nameFile.value;
+      if (nameFile == "")
+        nameFile="diagram.xml";
+      else
+        nameFile += ".xml";
+      this.saveData(xml,nameFile,"text/xml");
+    }
+    formSave.addEventListener("submit",funFormSubmit.bind(this));
+
+  }
+
+  onSaveLocalXMLButtonClick() {
+    let modal = document.getElementById("myModal");
+    let formSave = <HTMLFormElement> document.getElementById("local-save-form");
+    formSave.nameFile.value="";
+
+    modal.style.display = "block";
+  }
+
+  private getDiagramXML() {
+
+    let result = this.encoder.encode(this.graph.getModel());
+
+    return mx.mxUtils.getXml(result);
+
+  }
+
+  private saveData(data, fileName : string, type : string) {
+
+    let a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style.display = "none";
+
+    let blob = new Blob([data], { type: type + ";charset=utf-8" }),
+      url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+  }
+
 }
 
 class DiagramException extends Error {
 
   static BAD_HIERARCHY: number = 1;
   static CONNECT_ITSELF: number = 2;
+  static DOUBLE_RELATIONSHIP: number = 3;
 
   constructor(public type: number, public message: string) {
     super();
