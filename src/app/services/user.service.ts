@@ -8,7 +8,12 @@ export class UserService {
   constructor(private http : HttpClient) { }
 
   login(user) {
+    user.username = user.username.toLowerCase();
     return this.http.post("http://" + IPServer.VALUE + ":3000/auth/login",user);
+  }
+
+  signup(user) {
+    return this.http.post('http://' + IPServer.VALUE +  ":3000/users", user);
   }
 
   profile() {
@@ -18,4 +23,5 @@ export class UserService {
       }
     });
   }
+  
 }

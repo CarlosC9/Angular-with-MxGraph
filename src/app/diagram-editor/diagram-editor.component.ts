@@ -21,9 +21,9 @@ export class DiagramEditorComponent implements AfterViewInit {
   @ViewChild('toolbar', { static: false }) toolbarContainer: ElementRef;
   @ViewChild('saveLocalXML', { static: false }) saveLocalXMLInput: ElementRef;
 
-  public static ARROW_NOT_CREATE = 0;
-  public static ARROW_CREATE_PARENT = 1;
-  public static ARROW_CREATE_SCALE = 2;
+  public static readonly ARROW_NOT_CREATE = 0;
+  public static readonly ARROW_CREATE_PARENT = 1;
+  public static readonly ARROW_CREATE_SCALE = 2;
 
   private graph: mxgraph.mxGraph;
   private toolbar: mxgraph.mxToolbar;

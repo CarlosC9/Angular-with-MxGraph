@@ -5,9 +5,11 @@ import { Routes, RouterModule} from '@angular/router';
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', loadChildren: () => import('./home/home.module').then( m => m.HomeModule) },
-  { path: 'diagram', loadChildren: () => import('./diagram-page/diagram-page.module').then( m => m.DiagramPageModule) },
-  { path: 'diagram/:id', loadChildren: () => import('./diagram-page/diagram-page.module').then( m => m.DiagramPageModule)},
+  { path: 'diagram-editor', loadChildren: () => import('./diagram-page/diagram-page.module').then( m => m.DiagramPageModule) },
+  { path: 'diagram-editor/:id', loadChildren: () => import('./diagram-page/diagram-page.module').then( m => m.DiagramPageModule)},
   { path: 'login', loadChildren: () => import('./login-page/login-page.module').then( m => m.LoginPageModule) },
+  { path: 'signup', loadChildren: () => import('./signup-page/signup-page.module').then( m => m.SignupPageModule) },
+  { path: 'user-diagrams', loadChildren: () => import('./diagram-user-page/diagram-user-page.module').then( m => m.DiagramUserPageModule) },
 ];
 
 @NgModule({

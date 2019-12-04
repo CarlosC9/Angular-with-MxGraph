@@ -1,9 +1,9 @@
-<div id="login-page">
+<div id="signup-page">
     
-    <div class="login-box">
+    <div class="signup-box">
         <img src="assets/img/ITC_icon_login.png" alt="ITC">
-        <h1>Sign In</h1>
-        <form id="form-login">
+        <h1>Sign Up</h1>
+        <form id="form-signup">
             
             <label for="username">Username</label>
             <input name="username" type="text" placeholder="Username" autocomplete="off"/>
@@ -11,10 +11,11 @@
             <label for="password">Password</label>
             <input name="password" type="password" placeholder="Password">
 
-            <input type="submit" value="Sign In">
+            <input type="submit" value="Sign Up">
+
             <div id="error-message"></div>
 
-            <a routerLink="/signup" routerLinkActive="active">Sign Up</a>
+            <a routerLink="/login" routerLinkActive="active">Sign in</a>
             <br/>
             <a routerLink="/diagram-editor" routerLinkActive="active" >Continue without log in</a>
         </form>

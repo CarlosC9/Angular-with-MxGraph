@@ -1,3 +1,16 @@
-<div id="#diagram-user-page">
-    
+<div id="diagram-user-page">
+    <div class="header">
+        <div class="title-header">
+            My Diagrams
+        </div>
+        <button id="button-header-logout" class="button-header" (click)="onLogout()">Log out</button>
+    </div>
+    <div id="body-diagram-page">
+        <select id="select-type-diagram">
+            <option>Select type diagram</option>
+            <option value="owner">My Diagrams</option>
+            <option value="collaboration">My Collaborations</option>
+        </select>
+
+    </div>
 </div>
