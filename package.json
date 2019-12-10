@@ -23,11 +23,12 @@
     "@angular/pwa": "^0.803.19",
     "@angular/router": "~8.2.13",
     "@angular/service-worker": "~8.2.13",
+    "buffer": "^5.4.3",
     "hammerjs": "^2.0.8",
     "mxgraph": "^4.0.6",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
-    "xml2json-light": "^1.0.6",
+    "xml-js": "^1.6.11",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {

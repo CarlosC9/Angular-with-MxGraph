@@ -45,11 +45,6 @@
     border-radius: 2px;
 }
 
-#button-test {
-    position: relative;
-    height: 20px;
-}
-
 #container-buttons-down {
     position: absolute;
     top: calc(100% - 20px);
@@ -59,7 +54,12 @@
 
 .button-down {
     border-radius: 2px;
-    background-color: #B1C6F1 ;
+    background-color: #B1C6F1;
+    height: 20px;
+}
+
+.button-down-id {
+    display: none;
 }
 
 #popup {

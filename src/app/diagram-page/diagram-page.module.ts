@@ -4,12 +4,15 @@ import { RouterModule } from '@angular/router';
 
 import { DiagramPageComponent } from './diagram-page.component';
 import { DiagramEditorComponent } from '../diagram-editor/diagram-editor.component';
+import { DiagramsService } from '../services/diagrams.service';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
 @NgModule({
   declarations: [DiagramPageComponent,DiagramEditorComponent],
   imports: [
+    HttpClientModule,
     CommonModule,
     RouterModule.forChild([
       {
@@ -17,6 +20,7 @@ import { DiagramEditorComponent } from '../diagram-editor/diagram-editor.compone
         component: DiagramPageComponent
       }
     ])
-  ]
+  ],
+  providers : [DiagramsService],
 })
 export class DiagramPageModule { }

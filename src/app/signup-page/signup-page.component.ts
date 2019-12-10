@@ -62,7 +62,7 @@ export class SignupPageComponent implements AfterViewInit {
           (errorResponse: HttpErrorResponse) => {
             if (errorResponse.status == 400) {
               this.communicatingStatus = SignupPageComponent.NOT_COMMUNICATING;
-              let errorElement = document.getElementById("error-message");
+              let errorElement = document.getElementById("error-message-auth");
               errorElement.innerText = errorResponse.error.message;
               errorElement.style.display = 'block';
             }

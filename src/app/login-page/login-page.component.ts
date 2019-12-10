@@ -53,7 +53,7 @@ export class LoginPageComponent implements AfterViewInit {
           (errorResponse: HttpErrorResponse) => {
             if (errorResponse.status == 401) {
               this.communicatingStatus = LoginPageComponent.NOT_COMMUNICATING;
-              let errorElement = document.getElementById("error-message");
+              let errorElement = document.getElementById("error-message-auth");
               errorElement.innerText = "Username or password incorrect";
               errorElement.style.display = 'block';
             }

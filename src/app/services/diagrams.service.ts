@@ -7,13 +7,54 @@ import { IPServer } from '../ip.constans';
 })
 export class DiagramsService {
 
-  constructor(private http : HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-  getUserDiagram() {
-    return this.http.get("http://" + IPServer.VALUE + ":3000/diagrams", {
+  getUserDiagramOwner() {
+    return this.http.get("http://" + IPServer.VALUE + ":3000/diagrams/my-diagrams", {
       headers: {
         Authorization: "Bearer " + localStorage.getItem('access_token')
       }
     });
+  }
+
+  getUserDiagramsCollaboration() {
+    return this.http.get("http://" + IPServer.VALUE + ":3000/diagrams/my-collaborations", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('access_token')
+      }
+    });
+  }
+
+  newDiagram(name: string) {
+    return this.http.post("http://" + IPServer.VALUE + ":3000/diagrams",
+      {
+        name: name,
+      }
+      , {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      });
+  }
+
+  getDiagram(id: string) {
+    return this.http.get("http://" + IPServer.VALUE + ":3000/diagrams/" + id, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('access_token')
+      }
+    })
+  }
+
+  updateDiagram(id: string, diagram) {
+    return this.http.put("http://" + IPServer.VALUE + ":3000/diagrams/" + id,
+      {
+        diagram: diagram
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      }
+    )
   }
 }

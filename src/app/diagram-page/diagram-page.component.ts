@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-diagram-page',
   templateUrl: './diagram-page.component.html',
   styleUrls: ['./diagram-page.component.scss']
 })
-export class DiagramPageComponent implements OnInit {
+export class DiagramPageComponent implements AfterViewInit {
 
   constructor() { }
 
-  ngOnInit() {
+  ngAfterViewInit() {
   }
 
 }

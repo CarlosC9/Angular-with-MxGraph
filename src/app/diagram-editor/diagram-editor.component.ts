@@ -1,9 +1,12 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { mxgraph } from 'mxgraph';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DiagramsService } from '../services/diagrams.service';
+import { HttpErrorResponse } from '@angular/common/http';
+
+var convertXMLJSON = require('xml-js');
 
 declare var require: any;
-
-const parserXML2JSON = require('xml2json-light');
 
 const mx: typeof mxgraph = require('mxgraph')({
   mxBasePath: 'mxgraph'
@@ -16,6 +19,7 @@ const mx: typeof mxgraph = require('mxgraph')({
   encapsulation: ViewEncapsulation.None,
 })
 export class DiagramEditorComponent implements AfterViewInit {
+
 
   @ViewChild('graphContainer', { static: false }) graphContainer: ElementRef;
   @ViewChild('toolbar', { static: false }) toolbarContainer: ElementRef;
@@ -32,7 +36,11 @@ export class DiagramEditorComponent implements AfterViewInit {
   private sourceCell: mxgraph.mxCell;
   private statePrintArrow: number = 0;
 
-  constructor() { }
+  constructor(
+    private route: ActivatedRoute,
+    private diagramService: DiagramsService,
+    private router: Router,
+  ) { }
 
   ngAfterViewInit() {
 
@@ -41,6 +49,20 @@ export class DiagramEditorComponent implements AfterViewInit {
       mx.mxUtils.error('Browser is not supported!', 200, false);
 
     } else {
+
+      window['mxEditor'] = mx.mxEditor;
+      window['mxGeometry'] = mx.mxGeometry;
+      window['mxDefaultKeyHandler'] = mx.mxDefaultKeyHandler;
+      window['mxDefaultPopupMenu'] = mx.mxDefaultPopupMenu;
+      window['mxGraph'] = mx.mxGraph;
+      window['mxCell'] = mx.mxCell;
+      window['mxCellPath'] = mx.mxCellPath;
+      window['mxGraph'] = mx.mxGraph;
+      window['mxStylesheet'] = mx.mxStylesheet;
+      window['mxDefaultToolbar'] = mx.mxDefaultToolbar;
+      window['mxGraphModel'] = mx.mxGraphModel;
+
+      this.getDiagramId();
 
       this.graph = new mx.mxGraph(this.graphContainer.nativeElement);
       var style = this.graph.getStylesheet().getDefaultVertexStyle();
@@ -131,6 +153,50 @@ export class DiagramEditorComponent implements AfterViewInit {
 
     }
 
+  }
+
+  private getDiagramId() {
+    let id = this.route.snapshot.paramMap.get("id");
+    if (id != null) {
+
+      this.diagramService.getDiagram(id).subscribe(
+        (data) => {
+          console.log(data);
+          let xml = convertXMLJSON.js2xml(data, { compact: true, spaces: 0 });
+          console.log(xml);
+          this.graph.getModel().beginUpdate();
+          try {
+            var doc = mx.mxUtils.parseXml(xml);
+            var codec = new mx.mxCodec(doc);
+            codec.decode(doc.documentElement, this.graph.getModel());
+            //this.graph.fit();
+          } catch (error) {
+            console.log(error);
+          } finally {
+            this.graph.getModel().endUpdate();
+          }
+
+        },
+        (errorResponse: HttpErrorResponse) => {
+          if (errorResponse.status == 401) {
+            this.router.navigateByUrl("login");
+          }
+        }
+      )
+
+      let buttonsDownWithId = document.getElementsByClassName("button-down-id");
+      for (let i = 0; i < buttonsDownWithId.length; i++) {
+        let button = <HTMLButtonElement>buttonsDownWithId[i];
+        button.style.display = "inline-block";
+      }
+
+    } else {
+      let buttonsDownWithId = document.getElementsByClassName("button-down-id");
+      for (let i = 0; i < buttonsDownWithId.length; i++) {
+        let button = <HTMLButtonElement>buttonsDownWithId[i];
+        button.remove();
+      }
+    }
   }
 
   private createIconsEdges() {
@@ -304,8 +370,8 @@ export class DiagramEditorComponent implements AfterViewInit {
                 if (mx.mxUtils.isNode(edges[i].value) && edges[i].value.nodeName.toLowerCase() == 'parenttype'
                   && edges[i].target.id == cell.id)
                   throw new DiagramException(DiagramException.BAD_HIERARCHY, "A vertex cannot have two parents")
-                else if ( (edges[i].target.id == cell.id && edges[i].source.id == this.sourceCell.id) ||
-                  (edges[i].source.id == cell.id && edges[i].target.id == this.sourceCell.id) )
+                else if ((edges[i].target.id == cell.id && edges[i].source.id == this.sourceCell.id) ||
+                  (edges[i].source.id == cell.id && edges[i].target.id == this.sourceCell.id))
                   throw new DiagramException(DiagramException.DOUBLE_RELATIONSHIP, "Two vertex cannot have two relationship between each other");
               }
               let doc = mx.mxUtils.createXmlDocument();
@@ -333,8 +399,8 @@ export class DiagramEditorComponent implements AfterViewInit {
               }
               let edges: any[] = this.graph.getChildEdges(this.graph.getDefaultParent());
               for (let i = 0; i < edges.length; i++) {
-                if ( (edges[i].target.id == cell.id && edges[i].source.id == this.sourceCell.id) ||
-                  (edges[i].source.id == cell.id && edges[i].target.id == this.sourceCell.id) )
+                if ((edges[i].target.id == cell.id && edges[i].source.id == this.sourceCell.id) ||
+                  (edges[i].source.id == cell.id && edges[i].target.id == this.sourceCell.id))
                   throw new DiagramException(DiagramException.DOUBLE_RELATIONSHIP, "Two vertex cannot have two relationship between each other");
               }
               let doc = mx.mxUtils.createXmlDocument();
@@ -495,10 +561,10 @@ export class DiagramEditorComponent implements AfterViewInit {
   }
 
   private eventsModal() {
-    
+
     let modal = document.getElementById("myModal");
     let span = <HTMLElement>document.getElementsByClassName("close")[0];
-    let formSave = <HTMLFormElement> document.getElementById("local-save-form");
+    let formSave = <HTMLFormElement>document.getElementById("local-save-form");
 
     span.onclick = function () {
       modal.style.display = "none";
@@ -514,19 +580,19 @@ export class DiagramEditorComponent implements AfterViewInit {
       let xml = this.getDiagramXML();
       let nameFile = evt.target.nameFile.value;
       if (nameFile == "")
-        nameFile="diagram.xml";
+        nameFile = "diagram.xml";
       else
         nameFile += ".xml";
-      this.saveData(xml,nameFile,"text/xml");
+      this.saveData(xml, nameFile, "text/xml");
     }
-    formSave.addEventListener("submit",funFormSubmit.bind(this));
+    formSave.addEventListener("submit", funFormSubmit.bind(this));
 
   }
 
   onSaveLocalXMLButtonClick() {
     let modal = document.getElementById("myModal");
-    let formSave = <HTMLFormElement> document.getElementById("local-save-form");
-    formSave.nameFile.value="";
+    let formSave = <HTMLFormElement>document.getElementById("local-save-form");
+    formSave.nameFile.value = "";
 
     modal.style.display = "block";
   }
@@ -539,7 +605,7 @@ export class DiagramEditorComponent implements AfterViewInit {
 
   }
 
-  private saveData(data, fileName : string, type : string) {
+  private saveData(data, fileName: string, type: string) {
 
     let a = document.createElement("a");
     document.body.appendChild(a);
@@ -552,6 +618,21 @@ export class DiagramEditorComponent implements AfterViewInit {
     a.click();
     window.URL.revokeObjectURL(url);
 
+  }
+
+  onSaveCloudButton() {
+    let result = this.encoder.encode(this.graph.getModel());
+    let xml = mx.mxUtils.getXml(result);
+    console.log(xml);
+    let DiagramJSON = convertXMLJSON.xml2js(xml, { compact: true, spaces: 0 });
+    let id = this.route.snapshot.paramMap.get("id");
+    this.diagramService.updateDiagram(id, DiagramJSON).subscribe(
+      (data) => {
+
+      }, (errorResponse: HttpErrorResponse) => {
+
+      }
+    );
   }
 
 }

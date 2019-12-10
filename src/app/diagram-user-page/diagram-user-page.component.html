@@ -1,16 +1,48 @@
 <div id="diagram-user-page">
+
     <div class="header">
         <div class="title-header">
             My Diagrams
         </div>
         <button id="button-header-logout" class="button-header" (click)="onLogout()">Log out</button>
     </div>
+
     <div id="body-diagram-page">
+
         <select id="select-type-diagram">
             <option>Select type diagram</option>
             <option value="owner">My Diagrams</option>
             <option value="collaboration">My Collaborations</option>
         </select>
+
+        <ul id="list-owner" class="list-diagrams">
+            <li class="link-diagrams" attr.data-id="{{diagram.id}}" *ngFor="let diagram of diagramsOwner"
+                (click)="onDiagramSelect($event)">
+                &#x25CF; {{diagram.name}}
+            </li>
+        </ul>
+
+        <ul id="list-collaboration" class="list-diagrams">
+            <li class="link-diagrams" attr.data-id="{{diagram.id}}" *ngFor="let diagram of diagramsCollaboration"
+                (click)="onDiagramSelect($event)">
+                &#x25CF; {{diagram.name}}
+            </li>
+        </ul>
+
+        <img id="plus-img" src="assets/img/plus.png" alt="add" (click)="onAddDiagram()" />
+
+
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h4>Name of diagram</h4>
+                <form id="form-modal">
+                    <input name="nameDiagram" type="text"/>
+                    <input type="submit" value="OK">
+                </form>
+            </div>
+
+        </div>
 
     </div>
 </div>
