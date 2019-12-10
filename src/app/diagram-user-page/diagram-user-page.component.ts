@@ -11,8 +11,8 @@ import { UserService } from '../services/user.service';
 })
 export class DiagramUserPageComponent implements AfterViewInit {
 
-  private diagramsOwner;
-  private diagramsCollaboration;
+  public diagramsOwner;
+  public diagramsCollaboration;
 
   constructor(
     private diagramsService: DiagramsService,
@@ -20,9 +20,6 @@ export class DiagramUserPageComponent implements AfterViewInit {
   ) { }
 
   ngAfterViewInit() {
-
-    let headerHeight = (<HTMLDivElement>document.getElementsByClassName("header")[0]).offsetHeight;
-    document.getElementById("body-diagram-page").style.height = "calc(100% - " + headerHeight + "px)";
 
     this.requestDiagrams();
     this.eventsModal();
@@ -50,6 +47,9 @@ export class DiagramUserPageComponent implements AfterViewInit {
       (data) => {
         document.getElementById("diagram-user-page").style.display = "block";
         this.diagramsOwner = data;
+        let headerHeight = (<HTMLDivElement>document.getElementsByClassName("header")[0]).offsetHeight;
+        console.log(headerHeight);
+        document.getElementById("body-diagram-page").style.height = "calc(100% - " + headerHeight + "px)";
       },
       (errorResponse: HttpErrorResponse) => {
         if (errorResponse.status == 401) {

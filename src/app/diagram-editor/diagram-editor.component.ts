@@ -169,7 +169,6 @@ export class DiagramEditorComponent implements AfterViewInit {
             var doc = mx.mxUtils.parseXml(xml);
             var codec = new mx.mxCodec(doc);
             codec.decode(doc.documentElement, this.graph.getModel());
-            //this.graph.fit();
           } catch (error) {
             console.log(error);
           } finally {
@@ -620,19 +619,55 @@ export class DiagramEditorComponent implements AfterViewInit {
 
   }
 
+  onBackPage() {
+    this.router.navigateByUrl("login");
+  }
+
   onSaveCloudButton() {
     let result = this.encoder.encode(this.graph.getModel());
     let xml = mx.mxUtils.getXml(result);
-    console.log(xml);
     let DiagramJSON = convertXMLJSON.xml2js(xml, { compact: true, spaces: 0 });
     let id = this.route.snapshot.paramMap.get("id");
     this.diagramService.updateDiagram(id, DiagramJSON).subscribe(
       (data) => {
+        let errorElement = document.getElementById("successful-message");
+        errorElement.innerText = "The diagram has been saved successfully";
+        errorElement.style.display = "block";
+        setTimeout(() => {
+          errorElement.style.display = "none";
+        }, 5000)
 
       }, (errorResponse: HttpErrorResponse) => {
-
+        
       }
     );
+  }
+
+  onDeleteCloudButton() {
+    let id = this.route.snapshot.paramMap.get("id");
+    this.diagramService.deleteDiagram(id).subscribe(
+      (data) => {
+        this.router.navigateByUrl("user-diagrams");
+      },
+      (errorResponse: HttpErrorResponse) => {
+        switch (errorResponse.status){
+          case 401:
+            this.router.navigate(["http-error"],{queryParams : {
+              header : "Error 401 (UNAUTHORIZED)",
+              message : "You are not authorized to delete the diagram with id " + id,
+            }});
+            break;
+          case 404:
+              this.router.navigate(["http-error"],{queryParams : {
+                header : "Error 404 (NOT FOUND)",
+                message : "The diagram with id" + id + " was not found",
+              }});
+          default:
+            console.log(errorResponse);
+            break;
+        }
+      }
+    )
   }
 
 }

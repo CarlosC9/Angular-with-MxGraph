@@ -13,6 +13,9 @@
         <button class="button-down button-down-id" (click)="onSaveCloudButton()">
             Save diagram in cloud
         </button>
+        <button class="button-down button-down-id" (click)="onDeleteCloudButton()">
+            Delete Diagram in cloud
+        </button>
     </div>
 
     
@@ -30,5 +33,9 @@
 
     </div>
 
+    <img id="arrow-back" src="assets/img/arrow-back.png" alt="arrow-back" (click)="onBackPage()">
+
+    <div id="successful-message"></div>
     <div id="error-message"></div>
+    
 </div>

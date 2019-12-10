@@ -18,6 +18,20 @@
     display: none;
 }
 
+#successful-message {
+    position: absolute;
+    background-color: #D9FFCD;
+    border-radius: 3px;
+    padding: 4px 2px 4px 2px;
+    border: 1px solid green;
+    width: 33%;
+    left: 33%;
+    top: 10px;
+    font-size: 15px;
+    text-align: center;
+    display: none;
+}
+
 #graphContainer {
     position: absolute;
     width: 100%;
@@ -32,10 +46,22 @@
     width: 34px;
     padding: 4px 4px 4px 4px;
     left: 20px;
-    top: 22px;
+    top:70px;
     background-color: #DEDEDE;
     border-radius: 5px;
     z-index: 0;
+}
+
+#arrow-back {
+    position: absolute;
+    width: 34px;
+    padding: 4px 4px 4px 4px;
+    left: 20px;
+    top:20px;
+    border-radius: 50%;
+    z-index: 0;
+    cursor: pointer;
+    background-color: white;
 }
 
 #toolbar img {

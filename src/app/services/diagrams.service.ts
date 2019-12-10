@@ -57,4 +57,14 @@ export class DiagramsService {
       }
     )
   }
+
+  deleteDiagram(id: string) {
+    return this.http.delete("http://" + IPServer.VALUE + ":3000/diagrams/" + id,
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('access_token')
+      }
+    });
+  }
+
 }

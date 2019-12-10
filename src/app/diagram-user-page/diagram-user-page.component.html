@@ -18,14 +18,14 @@
         <ul id="list-owner" class="list-diagrams">
             <li class="link-diagrams" attr.data-id="{{diagram.id}}" *ngFor="let diagram of diagramsOwner"
                 (click)="onDiagramSelect($event)">
-                &#x25CF; {{diagram.name}}
+                {{diagram.name}}
             </li>
         </ul>
 
         <ul id="list-collaboration" class="list-diagrams">
             <li class="link-diagrams" attr.data-id="{{diagram.id}}" *ngFor="let diagram of diagramsCollaboration"
                 (click)="onDiagramSelect($event)">
-                &#x25CF; {{diagram.name}}
+                {{diagram.name}}
             </li>
         </ul>
 

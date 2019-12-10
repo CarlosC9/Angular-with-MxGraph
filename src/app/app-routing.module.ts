@@ -10,6 +10,7 @@ const routes: Routes = [
   { path: 'login', loadChildren: () => import('./login-page/login-page.module').then( m => m.LoginPageModule) },
   { path: 'signup', loadChildren: () => import('./signup-page/signup-page.module').then( m => m.SignupPageModule) },
   { path: 'user-diagrams', loadChildren: () => import('./diagram-user-page/diagram-user-page.module').then( m => m.DiagramUserPageModule) },
+  { path: 'http-error', loadChildren: () => import('./http-error-page/http-error-page.module').then( m => m.HttpErrorPageModule) },
 ];
 
 @NgModule({
