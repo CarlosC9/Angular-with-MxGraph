@@ -28,8 +28,8 @@ export class LoginPageComponent implements AfterViewInit {
         (error: HttpErrorResponse) => {
           if (error.status == 401) {
             localStorage.removeItem("access_token");
-            document.getElementById("login-page").style.display = "block";
           }
+          document.getElementById("login-page").style.display = "block";
         }
       )
     } else {
@@ -52,11 +52,15 @@ export class LoginPageComponent implements AfterViewInit {
           },
           (errorResponse: HttpErrorResponse) => {
             if (errorResponse.status == 401) {
-              this.communicatingStatus = LoginPageComponent.NOT_COMMUNICATING;
               let errorElement = document.getElementById("error-message-auth");
               errorElement.innerText = "Username or password incorrect";
               errorElement.style.display = 'block';
+            } else {
+              let errorElement = document.getElementById("error-message-auth");
+              errorElement.innerText = "Cannot sign in";
+              errorElement.style.display = 'block';
             }
+            this.communicatingStatus = LoginPageComponent.NOT_COMMUNICATING;
           });
       }
     });

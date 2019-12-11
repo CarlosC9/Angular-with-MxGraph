@@ -36,6 +36,9 @@ export class DiagramEditorComponent implements AfterViewInit {
   private sourceCell: mxgraph.mxCell;
   private statePrintArrow: number = 0;
 
+  private colorParentType = "#000000";
+  private colorScaleChange = "#05FF23";
+
   constructor(
     private route: ActivatedRoute,
     private diagramService: DiagramsService,
@@ -160,9 +163,39 @@ export class DiagramEditorComponent implements AfterViewInit {
     if (id != null) {
 
       this.diagramService.getDiagram(id).subscribe(
-        (data) => {
+        (data : any) => {
           console.log(data);
-          let xml = convertXMLJSON.js2xml(data, { compact: true, spaces: 0 });
+
+          let arrowsScaleChange = data.diagram.mxGraphModel.root.scalechange;
+          let arrowsParentType = data.diagram.mxGraphModel.root.parenttype;
+          this.colorScaleChange = data.colorScaleChage;
+          this.colorParentType = data.colorParentType;
+
+          if ( arrowsScaleChange != undefined) {
+            if (arrowsScaleChange instanceof Array) {
+              for (let i = 0; i < arrowsScaleChange.length; i++) {
+                arrowsScaleChange[i].mxCell._attributes.style = "strokeColor="+ this.colorScaleChange + 
+                  ";perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0";
+              }
+            } else if (arrowsScaleChange instanceof Object) {
+              arrowsScaleChange.mxCell._attributes.style = "strokeColor="+ this.colorScaleChange + 
+                ";perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0";
+            }
+          }
+
+          if (arrowsParentType != undefined) {
+            if (arrowsParentType instanceof Array) {
+              for (let i = 0; i < arrowsParentType.length; i++) {
+                arrowsParentType[i].mxCell._attributes.style = "strokeColor="+ this.colorParentType + 
+                  ";perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0";
+              }
+            } else if (arrowsParentType instanceof Object) {
+              arrowsParentType.mxCell._attributes.style = "strokeColor="+ this.colorParentType + 
+                ";perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0";
+            }
+          }
+
+          let xml = convertXMLJSON.js2xml(data.diagram, { compact: true, spaces: 0 });
           console.log(xml);
           this.graph.getModel().beginUpdate();
           try {
@@ -378,7 +411,7 @@ export class DiagramEditorComponent implements AfterViewInit {
               parentType.setAttribute('name', 'ParentType');
               parentType.setAttribute('property_1', '');
               this.graph.insertEdge(this.graph.getDefaultParent(), null, parentType,
-                this.sourceCell, cell, 'strokeColor=#000000;perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0');
+                this.sourceCell, cell, 'strokeColor='+ this.colorParentType +';perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0');
             } catch (ex) {
               if (ex instanceof DiagramException) {
                 let errorElement = document.getElementById("error-message");
@@ -407,7 +440,7 @@ export class DiagramEditorComponent implements AfterViewInit {
               scaleChangeType.setAttribute('name', 'ScaleChange');
               scaleChangeType.setAttribute('property_1', '');
               this.graph.insertEdge(this.graph.getDefaultParent(), null, scaleChangeType,
-                this.sourceCell, cell, 'strokeColor=#05FF23;perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0');
+                this.sourceCell, cell, 'strokeColor=' + this.colorScaleChange + ';perimeterSpacing=4;labelBackgroundColor=white;fontStyle=1;movable=0');
             } catch (ex) {
               if (ex instanceof DiagramException) {
                 let errorElement = document.getElementById("error-message");
@@ -638,7 +671,14 @@ export class DiagramEditorComponent implements AfterViewInit {
         }, 5000)
 
       }, (errorResponse: HttpErrorResponse) => {
-        
+        switch(errorResponse.status) {
+          case 401:
+            this.router.navigate(["http-error"],{queryParams : {
+              header : "Error 401 (UNAUTHORIZED)",
+              message : "You are not authorized to modify the diagram with id " + id,
+            }});
+            break;
+        }
       }
     );
   }

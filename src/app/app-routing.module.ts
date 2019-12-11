@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'signup', loadChildren: () => import('./signup-page/signup-page.module').then( m => m.SignupPageModule) },
   { path: 'user-diagrams', loadChildren: () => import('./diagram-user-page/diagram-user-page.module').then( m => m.DiagramUserPageModule) },
   { path: 'http-error', loadChildren: () => import('./http-error-page/http-error-page.module').then( m => m.HttpErrorPageModule) },
+  { path: 'user-configuration', loadChildren: () => import('./user-configuration-page/user-configuration-page.module').then(m => m.UserConfigurationPageModule)},
 ];
 
 @NgModule({

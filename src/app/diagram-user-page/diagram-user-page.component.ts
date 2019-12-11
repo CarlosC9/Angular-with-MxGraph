@@ -2,7 +2,6 @@ import { Component, AfterViewInit, Renderer, ElementRef } from '@angular/core';
 import { DiagramsService } from '../services/diagrams.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-diagram-user-page',
@@ -47,13 +46,16 @@ export class DiagramUserPageComponent implements AfterViewInit {
       (data) => {
         document.getElementById("diagram-user-page").style.display = "block";
         this.diagramsOwner = data;
-        let headerHeight = (<HTMLDivElement>document.getElementsByClassName("header")[0]).offsetHeight;
+        let headerHeight = (<HTMLDivElement>document.getElementsByClassName("header")[0]).offsetHeight + 20;
         console.log(headerHeight);
         document.getElementById("body-diagram-page").style.height = "calc(100% - " + headerHeight + "px)";
       },
       (errorResponse: HttpErrorResponse) => {
         if (errorResponse.status == 401) {
-          this.router.navigateByUrl("login");
+          this.router.navigate(["http-error"],{queryParams : {
+            header : "Error 401 (UNAUTHORIZED)",
+            message : "Not logged in",
+          }});
         }
       }
     );
@@ -92,7 +94,10 @@ export class DiagramUserPageComponent implements AfterViewInit {
           this.router.navigateByUrl("diagram-editor/" + data);
         }, (errorResponse) => {
           if (errorResponse.status == 401) {
-            this.router.navigateByUrl("login");
+            this.router.navigate(["http-error"],{queryParams : {
+              header : "Error 401 (UNAUTHORIZED)",
+              message : "Not logged in",
+            }});
           }
         }
       );
@@ -112,6 +117,10 @@ export class DiagramUserPageComponent implements AfterViewInit {
   onAddDiagram() {
     let modal = document.getElementById("myModal");
     modal.style.display = "block";
+  }
+
+  onConfiguration() {
+    this.router.navigateByUrl("user-configuration");
   }
 
 }

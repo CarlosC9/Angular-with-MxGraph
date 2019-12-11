@@ -1,0 +1,48 @@
+<div id="user-configuration-page">
+
+    <div class="header">
+        <div class="title-header">
+            My Configuration
+        </div>
+        <div id="back-header" (click)="onBack()">
+            <img src="assets/img/arrow-back.png" alt="back">
+        </div>
+        <button id="button-header-logout" class="button-header" (click)="onLogout()">Log out</button>
+    </div>
+
+    <div id="body-user-configuration-page">
+
+        <form id="form-configuration" (submit)="onConfigurationChange($event)">
+            <h4>Color arrow parent type</h4>
+            <p>
+                <input class="black-radio" type="radio" id="radio-button-1" name="colorParentType" value="#000000">
+                <label for="radio-button-1">Black</label>
+            </p>
+            <p>
+                <input class="pink-radio" type="radio" id="radio-button-2" name="colorParentType" value="#ff00f2">
+                <label for="radio-button-2">Pink</label>
+            </p>
+            <p>
+                <input class="orange-radio" type="radio" id="radio-button-3" name="colorParentType" value="#ff7b00">
+                <label for="radio-button-3">Orange</label>
+            </p>
+
+            <h4>Color arrow scale change</h4>
+            <p>
+                <input class="green-radio" type="radio" id="radio-button-4" name="colorScaleChange" value="#05FF23">
+                <label for="radio-button-4">Green</label>
+            </p>
+            <p>
+                <input class="blue-radio" type="radio" id="radio-button-5" name="colorScaleChange" value="#003cff">
+                <label for="radio-button-5">Blue</label>
+            </p>
+            <p>
+                <input class="red-radio" type="radio" id="radio-button-6" name="colorScaleChange" value="#ff0000">
+                <label for="radio-button-6">Red</label>
+            </p>
+            <input type="submit" value="Change Configuration"/>
+        </form>
+    </div>
+
+    <div id="successful-message-configurate"></div>
+</div>

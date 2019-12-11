@@ -23,5 +23,24 @@ export class UserService {
       }
     });
   }
+
+  getConfiguration() {
+    return this.http.get("http://" + IPServer.VALUE + ":3000/users/user-configuration", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('access_token')
+      }
+    })
+  }
+
+  updateConfiguration(colorParentType : string, colorScaleChange : string) {
+    return this.http.put("http://" + IPServer.VALUE + ":3000/users/user-configuration", {
+      colorParentType : colorParentType,
+      colorScaleChange : colorScaleChange,
+    }, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('access_token')
+      }
+    })
+  }
   
 }
