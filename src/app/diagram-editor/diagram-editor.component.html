@@ -16,6 +16,9 @@
         <button class="button-down button-down-id" (click)="onDeleteCloudButton()">
             Delete Diagram from cloud
         </button>
+        <button class="button-down button-down-id" (click)="onAddCollaboration()">
+            Add Collaboration
+        </button>
     </div>
 
     
@@ -27,6 +30,20 @@
             <form id="local-save-form">
                 <label for="nameFile">Insert file name:</label>
                 <input name="nameFile" type="text" placeholder="File name"/>
+                <input type="submit" value="Save">
+            </form>
+        </div>
+
+    </div>
+
+    <div id="myModal2" class="modal">
+
+        
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form id="add-collaboration-form">
+                <label for="nameCollaboration">Insert collaboration name:</label>
+                <input name="nameCollaboration" type="text" placeholder="Name Collaboration"/>
                 <input type="submit" value="Save">
             </form>
         </div>

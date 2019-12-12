@@ -76,86 +76,89 @@ export class DiagramEditorComponent implements AfterViewInit {
       this.toolbar.enabled = false;
       this.encoder = new mx.mxCodec(null);
 
+      this.customLabels();
       this.addToolbarInterfaceType('assets/mxgraph/rectangle.gif');
       this.createIconsEdges();
       this.createEventsGraph();
       this.eventsModal();
 
-      this.graph.convertValueToString = function (cell) {
-        if (mx.mxUtils.isNode(cell.value)) {
-
-          var name = cell.getAttribute('name', '');
-
-          return name;
-
-        }
-
-        return '';
-      };
-
-      var cellLabelChanged = this.graph.cellLabelChanged;
-      let funCellLabelChanged = (cell: mxgraph.mxCell, newValue, autoSize) => {
-        if (mx.mxUtils.isNode(cell.value)) {
-          try {
-
-            var edit = {
-              cell: cell,
-              attribute: "name",
-              value: newValue,
-              previous: newValue,
-              execute: function () {
-                if (this.cell != null) {
-                  var tmp = this.cell.getAttribute(this.attribute);
-
-                  if (this.previous == null) {
-                    this.cell.value.removeAttribute(this.attribute);
-                  }
-                  else {
-                    this.cell.setAttribute(this.attribute, this.previous);
-                  }
-
-                  this.previous = tmp;
-                }
-              }
-            };
-            this.graph.getModel().execute(edit);
-            this.graph.updateCellSize(cell);
-          }
-          finally {
-
-            this.graph.getModel().endUpdate();
-
-            let popup = document.getElementById("popup");
-
-            popup.style.display = "block";
-
-            popup.innerHTML = "";
-            popup.append(this.createButtonClosePopup());
-
-
-            for (let i = 0; i < cell.value.attributes.length; i++) {
-              let type = cell.value.attributes[i].name;
-              let value = cell.value.attributes[i].nodeValue;
-              popup.append(this.createInputForPopup(cell.id, type, value));
-            }
-
-
-          }
-        }
-      }
-
-      this.graph.cellLabelChanged = funCellLabelChanged.bind(this);
-
-      this.graph.getEditingValue = function (cell) {
-        if (mx.mxUtils.isNode(cell.value)) {
-          var name = cell.getAttribute('name', '');
-
-          return name;
-        }
-      };
-
     }
 
+  }
+
+  private customLabels() {
+    this.graph.convertValueToString = function (cell) {
+      if (mx.mxUtils.isNode(cell.value)) {
+
+        var name = cell.getAttribute('name', '');
+
+        return name;
+
+      }
+
+      return '';
+    };
+
+    var cellLabelChanged = this.graph.cellLabelChanged;
+    let funCellLabelChanged = (cell: mxgraph.mxCell, newValue, autoSize) => {
+      if (mx.mxUtils.isNode(cell.value)) {
+        try {
+
+          var edit = {
+            cell: cell,
+            attribute: "name",
+            value: newValue,
+            previous: newValue,
+            execute: function () {
+              if (this.cell != null) {
+                var tmp = this.cell.getAttribute(this.attribute);
+
+                if (this.previous == null) {
+                  this.cell.value.removeAttribute(this.attribute);
+                }
+                else {
+                  this.cell.setAttribute(this.attribute, this.previous);
+                }
+
+                this.previous = tmp;
+              }
+            }
+          };
+          this.graph.getModel().execute(edit);
+          this.graph.updateCellSize(cell);
+        }
+        finally {
+
+          this.graph.getModel().endUpdate();
+
+          let popup = document.getElementById("popup");
+
+          popup.style.display = "block";
+
+          popup.innerHTML = "";
+          popup.append(this.createButtonClosePopup());
+
+
+          for (let i = 0; i < cell.value.attributes.length; i++) {
+            let type = cell.value.attributes[i].name;
+            let value = cell.value.attributes[i].nodeValue;
+            popup.append(this.createInputForPopup(cell.id, type, value));
+          }
+
+
+        }
+      }
+    }
+
+    this.graph.cellLabelChanged = funCellLabelChanged.bind(this);
+
+    this.graph.getEditingValue = function (cell) {
+      if (mx.mxUtils.isNode(cell.value)) {
+        var name = cell.getAttribute('name', '');
+
+        return name;
+      }
+    };
   }
 
   private getDiagramId() {
@@ -419,7 +422,7 @@ export class DiagramEditorComponent implements AfterViewInit {
                 errorElement.style.display = "block";
                 setTimeout(() => {
                   errorElement.style.display = "none";
-                }, 5000)
+                }, 5000);
               }
             }
             break;
@@ -595,18 +598,26 @@ export class DiagramEditorComponent implements AfterViewInit {
   private eventsModal() {
 
     let modal = document.getElementById("myModal");
-    let span = <HTMLElement>document.getElementsByClassName("close")[0];
+    let modal2 = document.getElementById("myModal2");
+    let span = document.getElementsByClassName("close");
     let formSave = <HTMLFormElement>document.getElementById("local-save-form");
+    let formAddCollaboration = <HTMLFormElement>document.getElementById("add-collaboration-form");
 
-    span.onclick = function () {
-      modal.style.display = "none";
-    }
-    window.onclick = function (event) {
-      if (event.target == modal) {
+    for (let i = 0; i < span.length; i++) {
+      (<HTMLElement>span[i]).onclick = function () {
         modal.style.display = "none";
+        modal2.style.display = "none";
       }
     }
-    let funFormSubmit = (evt) => {
+    
+    window.onclick = function (event) {
+      if (event.target == modal && modal2) {
+        modal.style.display = "none";
+        modal2.style.display = "none";
+      }
+    }
+
+    let funFormSaveLocalSubmit = (evt) => {
       evt.preventDefault();
       modal.style.display = "none";
       let xml = this.getDiagramXML();
@@ -617,8 +628,36 @@ export class DiagramEditorComponent implements AfterViewInit {
         nameFile += ".xml";
       this.saveData(xml, nameFile, "text/xml");
     }
-    formSave.addEventListener("submit", funFormSubmit.bind(this));
+    formSave.addEventListener("submit", funFormSaveLocalSubmit.bind(this));
 
+    let funFormAddCollaboration = (evt) => {
+      evt.preventDefault();
+      modal2.style.display = "none";
+      let nameCollaboration = evt.target.nameCollaboration.value.toLowerCase();
+      let idDiagram  = this.route.snapshot.paramMap.get("id");
+      this.diagramService.addCollaborator(idDiagram,nameCollaboration).subscribe(
+        (data) => {
+          let successfulElement = document.getElementById("successful-message");
+        successfulElement.innerText = "The collaborator " + nameCollaboration +  " has been added";
+        successfulElement.style.display = "block";
+        setTimeout(() => {
+          successfulElement.style.display = "none";
+        }, 5000)
+        },
+        (errorResponse : HttpErrorResponse) => {
+          switch (errorResponse.status) {
+            case 404:
+                let errorElement = document.getElementById("error-message");
+                errorElement.innerText = errorResponse.error.message;
+                errorElement.style.display = "block";
+                setTimeout(() => {
+                  errorElement.style.display = "none";
+                }, 5000);
+          }
+        }
+        );
+    }
+    formAddCollaboration.addEventListener("submit", funFormAddCollaboration.bind(this));
   }
 
   onSaveLocalXMLButtonClick() {
@@ -663,11 +702,11 @@ export class DiagramEditorComponent implements AfterViewInit {
     let id = this.route.snapshot.paramMap.get("id");
     this.diagramService.updateDiagram(id, DiagramJSON).subscribe(
       (data) => {
-        let errorElement = document.getElementById("successful-message");
-        errorElement.innerText = "The diagram has been saved successfully";
-        errorElement.style.display = "block";
+        let successfulElement = document.getElementById("successful-message");
+        successfulElement.innerText = "The diagram has been saved successfully";
+        successfulElement.style.display = "block";
         setTimeout(() => {
-          errorElement.style.display = "none";
+          successfulElement.style.display = "none";
         }, 5000)
 
       }, (errorResponse: HttpErrorResponse) => {
@@ -708,6 +747,14 @@ export class DiagramEditorComponent implements AfterViewInit {
         }
       }
     )
+  }
+
+  onAddCollaboration() {
+    let modal = document.getElementById("myModal2");
+    let formSave = <HTMLFormElement>document.getElementById("add-collaboration-form");
+    formSave.nameCollaboration.value = "";
+
+    modal.style.display = "block";
   }
 
 }

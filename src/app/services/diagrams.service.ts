@@ -67,4 +67,16 @@ export class DiagramsService {
     });
   }
 
+  addCollaborator(id: string, nameCollaborator) {
+    return this.http.put("http://localhost:3000/diagrams/" + id +"/add-collaboration",
+    {
+      username: nameCollaborator,
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('access_token')
+      }
+    });
+  }
+
 }
