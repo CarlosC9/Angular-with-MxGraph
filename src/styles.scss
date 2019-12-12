@@ -1,4 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+    font-family: 'Bebas Neue';
+    src: url('/assets/BebasNeue-Regular');
+}
+
 html,body{
     margin:0;
     height: 100%;

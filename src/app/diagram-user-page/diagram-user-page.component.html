@@ -25,12 +25,12 @@
             </li>
         </ul>
 
-        <ul id="list-collaboration" class="list-diagrams">
-            <li class="link-diagrams" attr.data-id="{{diagram.id}}" *ngFor="let diagram of diagramsCollaboration"
+        <div id="list-collaboration" class="list-diagrams">
+            <div class="link-diagrams" attr.data-id="{{diagram.id}}" *ngFor="let diagram of diagramsCollaboration"
                 (click)="onDiagramSelect($event)">
                 {{diagram.name}}
-            </li>
-        </ul>
+            </div>
+        </div>
 
         <img id="plus-img" src="assets/img/plus.png" alt="add" (click)="onAddDiagram()" />
 

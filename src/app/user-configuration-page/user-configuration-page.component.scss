@@ -67,11 +67,11 @@
     background-color: #4AA6FF;
     cursor: pointer;
     font-size: 1.2rem;
+    transition: background-color 0.8s;
 }
 
 #form-configuration input[type="submit"]:hover {
-    color : #4AA6FF;
-    background-color: white;
+    background-color: #3A7EBF;
 }
 
 #successful-message-configurate {

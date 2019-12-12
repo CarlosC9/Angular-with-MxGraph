@@ -27,6 +27,7 @@
     cursor: pointer;
     top: 0px;
     right: 100px;
+    
 }
 
 #config-header img {
@@ -34,6 +35,15 @@
     width: 30px;
     margin: 15px 0px 0px 25px;
 }
+
+#config-header:hover img {
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 .header .button-header {
     position: absolute;
@@ -70,9 +80,17 @@
     cursor: pointer;
     display: table;
     margin-top: 5px;
-    text-decoration: underline;
-    color: blue;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    transition: font-size 0.5s, color 0.5s;
+}
+
+.link-diagrams:hover {
     font-size: 1.3rem;
+    color: #4c4c4c;
 }
 
 #plus-img {
@@ -81,6 +99,11 @@
     right: 10px;
     bottom: 10px;
     cursor: pointer;
+    transition: height 0.8s;
+}
+
+#plus-img:hover {
+    height: 60px;
 }
 
 .modal {

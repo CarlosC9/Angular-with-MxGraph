@@ -1,43 +1,26 @@
-h1 {
-    text-align: center;
-}
-
-.center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.wrapper {
-    margin : 50px 40px 0px 40px;
-    position: relative;
-}
-
-.wrapper .one {
-    position: absolute;
-    width: 45%;
-}
-
-.wrapper .two {
-    width: 45%;
-    position: absolute;
-    left: 55%;
-}
-
-.wrapper img {
+.line-image {
     width: 100%;
 }
 
-#button-start {
-    background-color: black;
-    border: 1px solid black;
-    font-size: 2rem;
-    border-radius: 10px;
-    color : white;
+.hover-start {
+    font-family: 'Bebas Neue', cursive;
+    width:min-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: -40px;
+    text-align: center;
+    font-size: 10rem;
+    cursor: pointer;
+    color: #4c4c4c;
+    transition: font-size 2s, color 2s;
 }
 
-#button-start:hover {
-    background-color: transparent;
-    color: black;
-    cursor:pointer;
+.hover-start:hover {
+    font-size: 12rem;
+    color: #131313;
+}
+
+.logo {
+    height: 180px;
+    width: auto;
 }
