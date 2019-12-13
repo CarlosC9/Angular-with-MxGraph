@@ -316,7 +316,7 @@ export class DiagramEditorComponent implements AfterViewInit {
     this.graph.addMouseListener(
       {
         mouseDown: this.mouseDownGraph.bind(this),
-        mouseMove: this.mouseMoveArrow.bind(this),
+        mouseMove: this.mouseMoveGraph.bind(this),
         mouseUp: this.mouseUpGraph.bind(this),
       }
     )
@@ -362,7 +362,7 @@ export class DiagramEditorComponent implements AfterViewInit {
 
   }
 
-  private mouseMoveArrow(sender, mouseEvent: mxgraph.mxMouseEvent) {
+  private mouseMoveGraph(sender, mouseEvent: mxgraph.mxMouseEvent) {
     if (this.statePrintArrow == 1) {
       let line: HTMLElement = document.getElementById("print-line");
       let sourceX = parseInt(line.getAttribute("x1"));
