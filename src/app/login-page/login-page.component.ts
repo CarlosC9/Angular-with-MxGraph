@@ -3,6 +3,7 @@ import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
@@ -66,6 +67,8 @@ export class LoginPageComponent implements AfterViewInit {
     });
   }
 
-
+  colorReport() {
+    window.open("http://localhost:3000/users/reportColor");
+  }
 
 }
