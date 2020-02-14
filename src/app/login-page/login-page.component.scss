@@ -79,8 +79,24 @@
     display: none;
 }
 
-button {
+.nav {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
+    width: 100%;
+    bottom: 0px;
+    list-style-type: none;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+}
+
+.nav li {
+    display: inline-block;
+    font-size: 20px;
+    padding: 20px;
+}
+
+.nav li a {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
 }
