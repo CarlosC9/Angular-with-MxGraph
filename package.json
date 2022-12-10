@@ -26,7 +26,7 @@
     "buffer": "^5.4.3",
     "fs": "0.0.1-security",
     "hammerjs": "^2.0.8",
-    "jsreport": "^2.6.1",
+    "jsreport": "^2.11.0",
     "jsreport-client": "^1.0.2",
     "mxgraph": "^4.0.6",
     "node-jasper": "^0.2.4",
